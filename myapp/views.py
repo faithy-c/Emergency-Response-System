@@ -35,7 +35,7 @@ def logout_view(request):
 
 
 # 🚨 REPORT INCIDENT
-@login_required
+
 def report(request):
     if request.method == 'POST':
         incident_type = request.POST.get('incident_type')
@@ -57,7 +57,7 @@ def report(request):
 
 
 # 🗺️ MAP PAGE (ROLE-BASED)
-@login_required
+
 def map_view(request):
     if request.user.is_staff:
         incidents = Incident.objects.all().order_by('-created_at')
