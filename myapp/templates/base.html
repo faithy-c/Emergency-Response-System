@@ -74,9 +74,10 @@
                 </li>
                 <!-- 🚪 Logout -->
                 <li class="nav-item ms-2">
-                    <a class="btn btn-outline-light btn-sm" href="{% url 'logout' %}">
-                        Logout
-                    </a>
+                    <form action={% url 'logout'%} method='post'>
+                        {% csrf_token%}
+                        <button class='btn btn-primary' style="display: inline;"> Loguot</button>
+                    </form>
                 </li>
             {% else %}
 
