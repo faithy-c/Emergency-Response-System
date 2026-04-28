@@ -5,12 +5,12 @@ from django.contrib.auth import authenticate, login, logout
 from .models import Incident
 
 
-# 🏠 HOME
+# HOME
 def home(request):
     return render(request, 'home.html')
 
 
-# 🔐 LOGIN
+# LOGIN
 def login_view(request):
     if request.method == "POST":
         username = request.POST.get("username")
