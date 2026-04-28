@@ -1,0 +1,162 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Emergency Response System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- 🌐 Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- 🎨 Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- 🧊 Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <!-- 🗺️ Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+</head>
+
+<body>
+
+<!-- 🚨 NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark shadow-sm px-3">
+
+    <a class="navbar-brand fw-bold" href="/">
+        🚨 Emergency System
+    </a>
+
+    <!-- Mobile Toggle -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Navbar Content -->
+    <div class="collapse navbar-collapse" id="navMenu">
+
+        <ul class="navbar-nav ms-auto align-items-center">
+
+            <li class="nav-item">
+                <a class="nav-link" href="/">Home</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="/report/">Report</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="/map/">Live Map</a>
+            </li>
+
+            <!-- 🚨 Panic Button -->
+            <li class="nav-item ms-2">
+                <a class="btn btn-danger btn-sm px-3" href="#" onclick="triggerPanic()">
+                    🚨 Panic
+                </a>
+            </li>
+
+            {% if user.is_authenticated %}
+
+                <!-- 👤 Username -->
+                <li class="nav-item ms-3">
+                    <span class="nav-link">👤 {{ user.username }}</span>
+                </li>
+
+                <!-- 📊 My Reports -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'dashboard' %}">My Reports</a>
+                </li>
+                <!-- 🚑 Dispatch Center -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'dispatcher' %}">Dispatch Center</a>
+                </li>
+                <!-- 🚪 Logout -->
+                <li class="nav-item ms-2">
+                    <a class="btn btn-outline-light btn-sm" href="{% url 'logout' %}">
+                        Logout
+                    </a>
+                </li>
+            {% else %}
+
+                <!-- 🔐 Login -->
+                <li class="nav-item ms-2">
+                    <a class="nav-link" href="{% url 'login' %}">Login</a>
+                </li>
+
+            {% endif %}
+
+        </ul>
+    </div>
+</nav>
+
+<!-- 📦 PAGE CONTENT -->
+<div class="container mt-4">
+    {% block content %}
+    {% endblock %}
+</div>
+
+<!-- 🗺️ Leaflet JS -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<!-- ⚙️ Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- 🚨 PANIC FUNCTION -->
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+            cookie = cookie.trim();
+            if (cookie.startsWith(name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function triggerPanic() {
+
+    if (!navigator.geolocation) {
+        alert("❌ GPS not supported on this device");
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(function(position) {
+
+        fetch("{% url 'panic' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": getCookie("csrftoken")
+            },
+            body: `latitude=${position.coords.latitude}&longitude=${position.coords.longitude}`
+        })
+        .then(res => res.json())
+        .then(data => {
+
+            if (data.status === "success") {
+                alert("🚨 Emergency reported successfully!");
+                window.location.href = "/map/";
+            } else {
+                alert("Error: " + data.message);
+            }
+
+        })
+        .catch(error => {
+            console.log(error);
+            alert("❌ Panic request failed");
+        });
+
+    }, function(error) {
+        alert("❌ Please enable location access");
+    });
+}
+</script>
+
+</body>
+</html>

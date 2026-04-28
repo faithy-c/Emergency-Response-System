@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="section-box">
+    <h2>📝 Report Emergency</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <label>Type</label>
+        <select name="incident_type" class="form-control">
+            <option value="fire">Fire</option>
+            <option value="accident">Accident</option>
+            <option value="crime">Crime</option>
+            <option value="medical">Medical</option>
+        </select>
+
+        <label class="mt-2">Description</label>
+        <textarea name="description" class="form-control"></textarea>
+
+        <!-- GPS AUTO FILL -->
+        <label class="mt-2">Latitude</label>
+        <input type="text" name="latitude" id="lat" class="form-control" readonly>
+
+        <label class="mt-2">Longitude</label>
+        <input type="text" name="longitude" id="lng" class="form-control" readonly>
+
+        <p class="text-muted mt-2" id="locationStatus">
+            📍 Detecting your location...
+        </p>
+
+        <button class="btn btn-danger mt-3">Submit Report</button>
+    </form>
+</div>
+
+<!-- 🚨 GPS SCRIPT -->
+<script>
+window.onload = function () {
+
+    if (!navigator.geolocation) {
+        document.getElementById("locationStatus").innerText =
+            "❌ GPS not supported";
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+        function(position) {
+
+            document.getElementById("lat").value =
+                position.coords.latitude;
+
+            document.getElementById("lng").value =
+                position.coords.longitude;
+
+            document.getElementById("locationStatus").innerText =
+                "✅ Location detected successfully";
+
+        },
+        function(error) {
+            document.getElementById("locationStatus").innerText =
+                "❌ Please enable location access";
+            console.log(error);
+        }
+    );
+
+};
+</script>
+
+{% endblock %}

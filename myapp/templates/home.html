@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- 🌈 HERO SECTION -->
+<div class="glass-hero text-center">
+    <h1>🚨 Emergency Response System</h1>
+    <p>Real-time monitoring & incident management system</p>
+
+    <button class="glass-btn" onclick="window.location.href='/report/'">
+        + Report Emergency
+    </button>
+</div>
+
+<!-- 📊 STATS CARDS -->
+<div class="glass-grid">
+
+    <div class="glass-card">
+        <h3>🚨 Active Incidents</h3>
+        <h2>{{ active_count|default:"5" }}</h2>
+    </div>
+
+    <div class="glass-card">
+        <h3>📍 Total Reports</h3>
+        <h2>{{ total_count|default:"25" }}</h2>
+    </div>
+
+    <div class="glass-card">
+        <h3>✅ Resolved</h3>
+        <h2>{{ resolved_count|default:"18" }}</h2>
+    </div>
+
+    <div class="glass-card">
+        <h3>🗺️ Live Map</h3>
+        <button class="glass-btn-small" onclick="window.location.href='/map/'">
+            Open Map
+        </button>
+    </div>
+
+</div>
+
+<!-- 🗺️ MAP PREVIEW -->
+<div class="glass-map">
+    <h3>Live Incident Preview</h3>
+    <div id="map" style="height: 300px;"></div>
+</div>
+
+<!-- 🌐 LEAFLET -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+    var map = L.map('map').setView([-1.286389, 36.817223], 12);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+</script>
+
+{% endblock %}

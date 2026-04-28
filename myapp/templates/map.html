@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="section-box">
+    <h2 class="text-center">🗺️ Emergency Incident Map</h2>
+    <p class="text-center">Live view of all reported emergencies</p>
+
+    <div id="map" style="height: 500px; border-radius: 10px;"></div>
+</div>
+
+<!-- LEAFLET -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+    // 🌍 Initialize map
+    var map = L.map('map').setView([-1.286389, 36.817223], 12);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // 🔴 Emergency icon
+    var emergencyIcon = new L.Icon({
+        iconUrl: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
+        iconSize: [32, 32]
+    });
+
+    var bounds = [];
+
+    // 🚨 Django incidents loop
+    {% for incident in incidents %}
+
+        {% if incident.latitude and incident.longitude %}
+
+            var marker = L.marker(
+                [{{ incident.latitude }}, {{ incident.longitude }}],
+                { icon: emergencyIcon }
+            ).addTo(map);
+
+            marker.bindPopup(
+                "<b>{{ incident.incident_type|title }}</b><br>" +
+                "{{ incident.description }}<br>" +
+                "<b>Status:</b> {{ incident.status }}"
+            );
+
+            bounds.push([{{ incident.latitude }}, {{ incident.longitude }}]);
+
+        {% endif %}
+
+    {% endfor %}
+
+    // 📍 Auto-zoom to all incidents
+    if (bounds.length > 0) {
+        map.fitBounds(bounds);
+    }
+
+</script>
+
+{% endblock %}
