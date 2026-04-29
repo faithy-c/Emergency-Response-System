@@ -27,14 +27,14 @@ def login_view(request):
     return render(request, 'login.html')
 
 
-# 🚪 LOGOUT
+# LOGOUT
 def logout_view(request):
     if request.user.is_authenticated:
         logout(request)
     return redirect('login')
 
 
-# 🚨 REPORT INCIDENT
+# REPORT INCIDENT
 
 def report(request):
     if request.method == 'POST':
@@ -56,28 +56,32 @@ def report(request):
     return render(request, 'report.html')
 
 
-# 🗺️ MAP PAGE (ROLE-BASED)
+# MAP PAGE (ROLE-BASED)
 
 def map_view(request):
-    if request.user.is_staff:
+    if request.user.is_authenticated and request.user.is_staff:
         incidents = Incident.objects.all().order_by('-created_at')
-    else:
+    elif request.user.is_authenticated:
         incidents = Incident.objects.filter(user=request.user).order_by('-created_at')
+    else:
+        incidents = Incident.objects.all().order_by('-created_at')
 
     return render(request, 'map.html', {'incidents': incidents})
 
 
-# 🚨 PANIC BUTTON
-@login_required
+# PANIC BUTTON
 def panic_incident(request):
     if request.method == "POST":
         try:
             latitude = request.POST.get("latitude") or 0
             longitude = request.POST.get("longitude") or 0
 
+            # SAFE USER HANDLING
+            user = request.user if request.user.is_authenticated else None
+
             incident = Incident.objects.create(
-                user=request.user,
-                incident_type="emergency",  # ⚠️ ensure this exists in your model choices
+                user=user,
+                incident_type="emergency",
                 description="Emergency triggered via panic button",
                 latitude=float(latitude),
                 longitude=float(longitude),
@@ -100,7 +104,7 @@ def panic_incident(request):
     }, status=400)
 
 
-# 📊 USER DASHBOARD (MY REPORTS)
+# USER DASHBOARD (MY REPORTS)
 @login_required
 def dashboard(request):
     incidents = Incident.objects.filter(user=request.user).order_by('-created_at')
@@ -121,3 +125,19 @@ def dispatcher(request):
     return render(request, 'dispatcher.html', {
         'incidents': incidents
     })
+
+@login_required
+def incident_data(request):
+    incidents = Incident.objects.all().order_by('-created_at')[:5]
+
+    data = [
+        {
+            "id": i.id,
+            "type": i.incident_type,
+            "lat": i.latitude,
+            "lng": i.longitude,
+        }
+        for i in incidents
+    ]
+
+    return JsonResponse({"incidents": data})

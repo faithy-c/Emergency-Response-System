@@ -18,7 +18,7 @@ class Incident(models.Model):
         ('Resolved', 'Resolved'),
     ]
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     incident_type = models.CharField(max_length=20, choices=INCIDENT_TYPES)
     description = models.TextField()
 
@@ -34,4 +34,5 @@ class Incident(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.get_incident_type_display()} - {self.user.username}"
+      username = self.user.username if self.user else "Anonymous"
+      return f"{self.get_incident_type_display()} - {username}"

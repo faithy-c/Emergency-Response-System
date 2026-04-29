@@ -1,10 +1,20 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 
 <div class="section-box">
-    <h2>🚨 Live Dispatch Center</h2>
+    <h2 class="text-danger">🚨 Live Dispatch Center</h2>
 
+    <!-- ALERT SOUND (DISPATCHER ONLY PAGE) -->
+    <audio id="alertSound" src="{% static 'sounds/alert.mp3' %}" preload="auto"></audio>
+
+    <!-- ALERT BANNER -->
+    <div id="alertBanner" class="alert alert-danger text-center" style="display:none;">
+        🚨 NEW EMERGENCY DETECTED 🚨
+    </div>
+    
+    <!-- INCIDENT TABLE -->
     <table class="table table-dark table-hover">
         <thead>
             <tr>
@@ -14,7 +24,8 @@
                 <th>Location</th>
             </tr>
         </thead>
-        <tbody>
+
+        <tbody id="incidentTable">
             {% for incident in incidents %}
             <tr>
                 <td>{{ incident.user.username }}</td>
@@ -26,5 +37,85 @@
         </tbody>
     </table>
 </div>
+
+<!-- SCRIPT -->
+<script>
+let lastIncidentId = 0;
+
+
+function playAlertSound() {
+    const audio = document.getElementById("alertSound");
+
+    if (!audio) return;
+
+    audio.pause();
+    audio.currentTime = 0;
+
+    audio.play().catch(err => {
+        console.log("Audio blocked:", err);
+    });
+}
+
+/* ALERT BANNER */
+function showAlertBanner() {
+    const banner = document.getElementById("alertBanner");
+
+    banner.style.display = "block";
+
+    setTimeout(() => {
+        banner.style.display = "none";
+    }, 4000);
+}
+
+/* UPDATE TABLE */
+function updateTable(incidents) {
+    const table = document.getElementById("incidentTable");
+
+    table.innerHTML = "";
+
+    incidents.forEach(i => {
+        table.innerHTML += `
+            <tr>
+                <td>${i.user ?? "Unknown"}</td>
+                <td>${i.type ?? "N/A"}</td>
+                <td>Pending</td>
+                <td>${i.lat}, ${i.lng}</td>
+            </tr>
+        `;
+    });
+}
+
+/* FETCH INCIDENTS */
+function checkNewIncidents() {
+    fetch("{% url 'map_data' %}")
+        .then(res => res.json())
+        .then(data => {
+
+            if (!data.incidents) return;
+
+            let incidents = data.incidents;
+
+            if (incidents.length > 0) {
+
+                let latest = incidents[0];
+
+                if (latest.id > lastIncidentId) {
+
+                    playAlertSound();
+                    showAlertBanner();
+                    lastIncidentId = latest.id;
+                }
+
+                updateTable(incidents);
+            }
+        })
+        .catch(err => console.log("Fetch error:", err));
+}
+
+/* AUTO REFRESH */
+setInterval(checkNewIncidents, 5000);
+
+
+</script>
 
 {% endblock %}

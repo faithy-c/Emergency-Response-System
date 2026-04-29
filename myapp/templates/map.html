@@ -14,14 +14,14 @@
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script>
-    // 🌍 Initialize map
+    // Initialize map
     var map = L.map('map').setView([-1.286389, 36.817223], 12);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
     }).addTo(map);
 
-    // 🔴 Emergency icon
+    // Emergency icon
     var emergencyIcon = new L.Icon({
         iconUrl: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
         iconSize: [32, 32]
@@ -29,7 +29,7 @@
 
     var bounds = [];
 
-    // 🚨 Django incidents loop
+    // Django incidents loop
     {% for incident in incidents %}
 
         {% if incident.latitude and incident.longitude %}
