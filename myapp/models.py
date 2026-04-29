@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 
 class Incident(models.Model):
@@ -30,8 +31,10 @@ class Incident(models.Model):
         choices=STATUS_CHOICES,
         default='Pending'
     )
+    time = models.DateTimeField(default=timezone.now)
 
     created_at = models.DateTimeField(auto_now_add=True)
+    bool = models.BooleanField(default=False)
 
     def __str__(self):
       username = self.user.username if self.user else "Anonymous"

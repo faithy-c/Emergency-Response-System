@@ -37,6 +37,8 @@ def logout_view(request):
 # REPORT INCIDENT
 
 def report(request):
+    if request.user.is_authenticated:
+        return redirect('home')
     if request.method == 'POST':
         incident_type = request.POST.get('incident_type')
         description = request.POST.get('description')
@@ -44,7 +46,7 @@ def report(request):
         longitude = request.POST.get('longitude') or 0
 
         Incident.objects.create(
-            user=request.user,
+            # user=request.user,
             incident_type=incident_type,
             description=description,
             latitude=float(latitude),
@@ -77,10 +79,10 @@ def panic_incident(request):
             longitude = request.POST.get("longitude") or 0
 
             # SAFE USER HANDLING
-            user = request.user if request.user.is_authenticated else None
+            user = request.user if request.user.is_authenticated else "Unknown user"
 
             incident = Incident.objects.create(
-                user=user,
+                # user=user,
                 incident_type="emergency",
                 description="Emergency triggered via panic button",
                 latitude=float(latitude),

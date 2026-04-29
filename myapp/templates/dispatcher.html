@@ -22,6 +22,7 @@
                 <th>Type</th>
                 <th>Status</th>
                 <th>Location</th>
+                <th>Time</th>
             </tr>
         </thead>
 
@@ -32,6 +33,7 @@
                 <td>{{ incident.incident_type }}</td>
                 <td>{{ incident.status }}</td>
                 <td>{{ incident.latitude }}, {{ incident.longitude }}</td>
+                <td>{{ incident.time }}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -80,6 +82,7 @@ function updateTable(incidents) {
                 <td>${i.type ?? "N/A"}</td>
                 <td>Pending</td>
                 <td>${i.lat}, ${i.lng}</td>
+                <td>${i.time}</td>
             </tr>
         `;
     });
@@ -104,6 +107,7 @@ function checkNewIncidents() {
                     playAlertSound();
                     showAlertBanner();
                     lastIncidentId = latest.id;
+                    
                 }
 
                 updateTable(incidents);

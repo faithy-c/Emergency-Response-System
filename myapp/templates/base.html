@@ -39,22 +39,22 @@
             <li class="nav-item">
                 <a class="nav-link" href="/">Home</a>
             </li>
-
+            {% if not user.is_authenticated %}
             <li class="nav-item">
                 <a class="nav-link" href="/report/">Report</a>
             </li>
-
+            {% endif %}
             <li class="nav-item">
                 <a class="nav-link" href="/map/">Live Map</a>
             </li>
-
+            {% if not user.is_authenticated %}
             <!-- Panic Button (PUBLIC) -->
             <li class="nav-item ms-2">
                 <a class="btn btn-danger btn-sm px-3" href="#" onclick="triggerPanic()">
                     🚨 Panic
                 </a>
             </li>
-
+            {% endif %}
             {% if user.is_authenticated %}
 
                 <li class="nav-item ms-3">
