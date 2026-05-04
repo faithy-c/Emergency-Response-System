@@ -7,7 +7,10 @@ from .models import Incident
 
 # HOME
 def home(request):
-    return render(request, 'home.html')
+    total = Incident.objects.all().count()
+    pending = Incident.objects.filter(incident_type='Pending').count()
+    resolved = Incident.objects.filter(incident_type='Pending').count()
+    return render(request, 'home.html', { 'total': total, 'pending': pending, 'resolved': resolved})
 
 
 # LOGIN
