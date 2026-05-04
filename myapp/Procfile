@@ -1,0 +1,1 @@
+web: gunicorn emergencyresponse_system.wsgi:application

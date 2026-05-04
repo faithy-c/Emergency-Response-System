@@ -11,26 +11,28 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
-import dj_database_url
 import os
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+import dj_database_url
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
+# SECURITY
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY",
+    "django-insecure-z&1k(d=(pfyot99#r!6h3m(l=tqz36zp30=isizsyd6m+h$+n@"
+)
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-z&1k(d=(pfyot99#r!6h3m(l=tqz36zp30=isizsyd6m+h$+n@'
+DEBUG = False
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    ".onrender.com",
+]
 
-ALLOWED_HOSTS = ["*"]
 
-
-# Application definition
-
+# APPLICATIONS
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -42,9 +44,11 @@ INSTALLED_APPS = [
     'myapp',
 ]
 
+
+# MIDDLEWARE (IMPORTANT ORDER FIX)
 MIDDLEWARE = [
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -53,8 +57,11 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+
 ROOT_URLCONF = 'emergencyresponse_system.urls'
 
+
+# TEMPLATES
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -70,52 +77,41 @@ TEMPLATES = [
     },
 ]
 
+
 WSGI_APPLICATION = 'emergencyresponse_system.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/6.0/ref/settings/#databases
+# DATABASE (SAFE FOR RENDER + LOCAL)
 DATABASES = {
-    'default': dj_database_url.parse(os.environ.get("DATABASE_URL"))
+    "default": dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
+    )
 }
 
-# Password validation
-# https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
+# PASSWORD VALIDATION
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/6.0/topics/i18n/
-
+# INTERNATIONALIZATION
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/6.0/howto/static-files/
-
+# STATIC FILES (IMPORTANT FOR RENDER)
+STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / "staticfiles"
-STATIC_URL = "/static/"
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 
-LOGIN_REDIRECT_URL = 'home'  # Go to homepage after login
-LOGOUT_REDIRECT_URL = 'login' # Go to login page after logout
+# LOGIN SETTINGS
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'login'
