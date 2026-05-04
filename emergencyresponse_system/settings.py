@@ -29,6 +29,7 @@ ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
     ".onrender.com",
+    "https://emergency-response-system-1-s3rb.onrender.com/"
 ]
 
 
